@@ -56,6 +56,7 @@ cd system_absensi
 flutter pub get
 flutter run
 ```
+
 ````
 
 > 💡 Gunakan emulator Android atau perangkat fisik agar semua fitur berjalan optimal.
@@ -85,5 +86,3 @@ flutter run
 Proyek ini dilindungi oleh lisensi MIT. Silakan gunakan, modifikasi, dan distribusikan dengan menyertakan atribusi kepada pengembang asli.
 
 ---
-
-```
