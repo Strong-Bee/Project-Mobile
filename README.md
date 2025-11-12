@@ -55,9 +55,6 @@ cd system_absensi
 # Jalankan aplikasi
 flutter pub get
 flutter run
-```
-
-````
 
 > 💡 Gunakan emulator Android atau perangkat fisik agar semua fitur berjalan optimal.
 
