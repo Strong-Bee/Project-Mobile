@@ -19,24 +19,25 @@ Aplikasi ini dirancang dengan antarmuka modern, ringan, dan mudah digunakan baik
 
 ## 🧩 Teknologi yang Digunakan
 
-| Layer | Teknologi |
-|-------|------------|
-| **Frontend (Mobile)** | Flutter (Dart) |
-| **Backend** | Firebase / REST API |
-| **Database** | Cloud Firestore / MySQL |
-| **Design System** | Tailwind-inspired UI (custom Flutter styling) |
-| **Version Control** | Git & GitHub |
+| Layer                 | Teknologi                                     |
+| --------------------- | --------------------------------------------- |
+| **Frontend (Mobile)** | Flutter (Dart)                                |
+| **Backend**           | Firebase / REST API                           |
+| **Database**          | Cloud Firestore / MySQL                       |
+| **Design System**     | Tailwind-inspired UI (custom Flutter styling) |
+| **Version Control**   | Git & GitHub                                  |
 
 ---
 
 ## 📱 Tampilan Antarmuka
+
 - **Splash Screen / Loader**
 - **Form Login**
 - **Dashboard (Statistik & Jadwal)**
 - **Tabel Absensi Realtime**
 - **Navigasi Bawah (Home, Absensi, Laporan, Profil)**
 
-> Desain diadaptasi dari tema branding *Coach Aldo Ranch* dengan warna dominan oranye dan elemen kayu alami yang merepresentasikan suasana wisata berkuda.
+> Desain diadaptasi dari tema branding _Coach Aldo Ranch_ dengan warna dominan oranye dan elemen kayu alami yang merepresentasikan suasana wisata berkuda.
 
 ---
 
@@ -54,10 +55,35 @@ cd system_absensi
 # Jalankan aplikasi
 flutter pub get
 flutter run
+```
+````
 
+> 💡 Gunakan emulator Android atau perangkat fisik agar semua fitur berjalan optimal.
 
 ---
 
-## 💡 Gunakan emulator Android atau perangkat fisik agar semua fitur berjalan optimal.
+## 🧠 Pengembangan Selanjutnya
+
+- Integrasi GPS untuk pencatatan lokasi absensi
+- Fitur notifikasi otomatis untuk keterlambatan
+- Sistem multi-cabang (untuk lokasi wisata lain)
+- Dashboard web berbasis admin panel
 
 ---
+
+## 👨‍💻 Tim Pengembang
+
+**Strong Bee Developer**
+🟠 Freelance Software Studio – spesialisasi pada sistem manajemen & otomasi berbasis Flutter dan Web.
+📧 Email: [support@strongbeedev.com](mailto:support@strongbeedev.com)
+🌐 Website: [https://strongbeedev.com](https://strongbeedev.com)
+
+---
+
+## 📜 Lisensi
+
+Proyek ini dilindungi oleh lisensi MIT. Silakan gunakan, modifikasi, dan distribusikan dengan menyertakan atribusi kepada pengembang asli.
+
+---
+
+```
