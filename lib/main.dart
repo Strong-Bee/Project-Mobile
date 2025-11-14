@@ -72,7 +72,6 @@ class _SplashScreenState extends State<SplashScreen>
           ).centered(),
         ),
         20.heightBox,
-        "Loading...".text.gray500.make().p4(),
       ]).centered(),
     );
   }
