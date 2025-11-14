@@ -1,7 +1,91 @@
 import 'package:flutter/material.dart';
 
-class ForgotPasswordPage extends StatelessWidget {
+class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({super.key});
+
+  @override
+  State<ForgotPasswordPage> createState() => _ForgotPasswordPageState();
+}
+
+class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
+  final _formKey = GlobalKey<FormState>();
+  final _emailController = TextEditingController();
+  bool _isLoading = false;
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    super.dispose();
+  }
+
+  void _resetPassword() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    // Simulate API call
+    await Future.delayed(const Duration(seconds: 2));
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    // Show success dialog
+    _showResetDialog();
+  }
+
+  void _showResetDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: const Row(
+            children: [
+              Icon(Icons.check_circle_rounded, color: Colors.green, size: 28),
+              SizedBox(width: 12),
+              Text("Email Sent"),
+            ],
+          ),
+          content: const Text(
+            "We've sent a password reset link to your email address. Please check your inbox and follow the instructions.",
+            style: TextStyle(height: 1.5),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Close dialog
+                Navigator.pop(context); // Go back to login
+              },
+              child: const Text(
+                "OK",
+                style: TextStyle(
+                  color: Color(0xFF667EEA),
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  String? _validateEmail(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter your email';
+    }
+    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+    if (!emailRegex.hasMatch(value)) {
+      return 'Please enter a valid email';
+    }
+    return null;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -140,35 +224,38 @@ class ForgotPasswordPage extends StatelessWidget {
           ],
           border: Border.all(color: Colors.grey.withOpacity(0.1), width: 1),
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Instruction Text
-            Text(
-              "Don't worry! Just enter your email and we'll send you a reset link.",
-              style: TextStyle(
-                fontSize: isSmallScreen ? 14 : 15,
-                color: Colors.grey[700],
-                height: 1.5,
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Instruction Text
+              Text(
+                "Don't worry! Just enter your email and we'll send you a reset link.",
+                style: TextStyle(
+                  fontSize: isSmallScreen ? 14 : 15,
+                  color: Colors.grey[700],
+                  height: 1.5,
+                ),
+                textAlign: TextAlign.center,
               ),
-              textAlign: TextAlign.center,
-            ),
 
-            SizedBox(height: isSmallScreen ? 24 : 32),
+              SizedBox(height: isSmallScreen ? 24 : 32),
 
-            // Email Field
-            _buildEmailField(isSmallScreen),
+              // Email Field
+              _buildEmailField(isSmallScreen),
 
-            SizedBox(height: isSmallScreen ? 16 : 20),
+              SizedBox(height: isSmallScreen ? 16 : 20),
 
-            // Information Card
-            _buildInfoCard(isSmallScreen),
+              // Information Card
+              _buildInfoCard(isSmallScreen),
 
-            SizedBox(height: isSmallScreen ? 24 : 32),
+              SizedBox(height: isSmallScreen ? 24 : 32),
 
-            // Send Reset Link Button
-            _buildResetButton(context, isSmallScreen),
-          ],
+              // Send Reset Link Button
+              _buildResetButton(context, isSmallScreen),
+            ],
+          ),
         ),
       ),
     );
@@ -190,7 +277,10 @@ class ForgotPasswordPage extends StatelessWidget {
         const SizedBox(height: 8),
         SizedBox(
           height: 55,
-          child: TextField(
+          child: TextFormField(
+            controller: _emailController,
+            validator: _validateEmail,
+            keyboardType: TextInputType.emailAddress,
             decoration: InputDecoration(
               hintText: "your@email.com",
               prefixIcon: const Icon(Icons.email_rounded, color: Colors.grey),
@@ -248,81 +338,63 @@ class ForgotPasswordPage extends StatelessWidget {
       child: Material(
         borderRadius: BorderRadius.circular(12),
         child: InkWell(
-          onTap: () {
-            // Reset password action
-            _showResetDialog(context);
-          },
+          onTap: _isLoading ? null : _resetPassword,
           borderRadius: BorderRadius.circular(12),
           child: Container(
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
-              ),
+              gradient: _isLoading
+                  ? const LinearGradient(
+                      colors: [Colors.grey, Colors.grey],
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                    )
+                  : const LinearGradient(
+                      colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                    ),
               borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.purple.withOpacity(0.3),
-                  blurRadius: 10,
-                  offset: const Offset(0, 5),
-                ),
-              ],
+              boxShadow: _isLoading
+                  ? []
+                  : [
+                      BoxShadow(
+                        color: Colors.purple.withOpacity(0.3),
+                        blurRadius: 10,
+                        offset: const Offset(0, 5),
+                      ),
+                    ],
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
-                  "Send Reset Link",
-                  style: TextStyle(
-                    fontSize: isSmallScreen ? 16 : 18,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
+                if (_isLoading)
+                  SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        Colors.white.withOpacity(0.7),
+                      ),
+                    ),
+                  )
+                else
+                  Text(
+                    "Send Reset Link",
+                    style: TextStyle(
+                      fontSize: isSmallScreen ? 16 : 18,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                const Icon(Icons.send_rounded, color: Colors.white, size: 20),
+                if (!_isLoading) const SizedBox(width: 12),
+                if (!_isLoading)
+                  const Icon(Icons.send_rounded, color: Colors.white, size: 20),
               ],
             ),
           ),
         ),
       ),
-    );
-  }
-
-  void _showResetDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          title: const Row(
-            children: [
-              Icon(Icons.check_circle_rounded, color: Colors.green, size: 28),
-              SizedBox(width: 12),
-              Text("Email Sent"),
-            ],
-          ),
-          content: const Text(
-            "We've sent a password reset link to your email address. Please check your inbox and follow the instructions.",
-            style: TextStyle(height: 1.5),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text(
-                "OK",
-                style: TextStyle(
-                  color: Color(0xFF667EEA),
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ],
-        );
-      },
     );
   }
 

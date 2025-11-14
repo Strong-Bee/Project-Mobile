@@ -1,7 +1,91 @@
 import 'package:flutter/material.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final _formKey = GlobalKey<FormState>();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  bool _obscurePassword = true;
+  bool _isLoading = false;
+  bool _rememberMe = false;
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  void _login() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    // Simulate API call
+    await Future.delayed(const Duration(seconds: 2));
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    // Show success message
+    _showLoginSuccess();
+  }
+
+  void _showLoginSuccess() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text('Login successful!'),
+        backgroundColor: Colors.green,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
+
+    // Navigate to home page or main app
+    // Navigator.pushReplacementNamed(context, '/home');
+  }
+
+  String? _validateEmail(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter your email';
+    }
+    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+    if (!emailRegex.hasMatch(value)) {
+      return 'Please enter a valid email';
+    }
+    return null;
+  }
+
+  String? _validatePassword(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter your password';
+    }
+    if (value.length < 6) {
+      return 'Password must be at least 6 characters';
+    }
+    return null;
+  }
+
+  void _showSocialLoginMessage(String platform) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('$platform login selected'),
+        backgroundColor: const Color(0xFF667EEA),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +108,6 @@ class LoginPage extends StatelessWidget {
                       vertical: 20,
                     ),
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         // Header Section
                         _buildHeaderSection(context, isSmallScreen),
@@ -132,48 +215,51 @@ class LoginPage extends StatelessWidget {
           ],
           border: Border.all(color: Colors.grey.withOpacity(0.1), width: 1),
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Title
-            Text(
-              "Login",
-              style: TextStyle(
-                fontSize: isSmallScreen ? 20 : 24,
-                fontWeight: FontWeight.w600,
-                color: Colors.black87,
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Title
+              Text(
+                "Login",
+                style: TextStyle(
+                  fontSize: isSmallScreen ? 20 : 24,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black87,
+                ),
               ),
-            ),
-            SizedBox(height: isSmallScreen ? 24 : 32),
+              SizedBox(height: isSmallScreen ? 24 : 32),
 
-            // Email Field
-            _buildEmailField(isSmallScreen),
+              // Email Field
+              _buildEmailField(isSmallScreen),
 
-            SizedBox(height: isSmallScreen ? 16 : 20),
+              SizedBox(height: isSmallScreen ? 16 : 20),
 
-            // Password Field
-            _buildPasswordField(isSmallScreen),
+              // Password Field
+              _buildPasswordField(isSmallScreen),
 
-            SizedBox(height: isSmallScreen ? 12 : 16),
+              SizedBox(height: isSmallScreen ? 12 : 16),
 
-            // Remember me & Forgot password
-            _buildRememberForgotSection(context, isSmallScreen),
+              // Remember me & Forgot password
+              _buildRememberForgotSection(context, isSmallScreen),
 
-            SizedBox(height: isSmallScreen ? 24 : 32),
+              SizedBox(height: isSmallScreen ? 24 : 32),
 
-            // Login Button
-            _buildLoginButton(context, isSmallScreen),
+              // Login Button
+              _buildLoginButton(context, isSmallScreen),
 
-            SizedBox(height: isSmallScreen ? 24 : 32),
+              SizedBox(height: isSmallScreen ? 24 : 32),
 
-            // Divider
-            _buildDividerSection(isSmallScreen),
+              // Divider
+              _buildDividerSection(isSmallScreen),
 
-            SizedBox(height: isSmallScreen ? 20 : 28),
+              SizedBox(height: isSmallScreen ? 20 : 28),
 
-            // Social Login
-            _buildSocialLoginSection(isSmallScreen),
-          ],
+              // Social Login
+              _buildSocialLoginSection(isSmallScreen),
+            ],
+          ),
         ),
       ),
     );
@@ -195,7 +281,10 @@ class LoginPage extends StatelessWidget {
         const SizedBox(height: 8),
         SizedBox(
           height: 55,
-          child: TextField(
+          child: TextFormField(
+            controller: _emailController,
+            validator: _validateEmail,
+            keyboardType: TextInputType.emailAddress,
             decoration: InputDecoration(
               hintText: "your@email.com",
               prefixIcon: const Icon(Icons.email_rounded, color: Colors.grey),
@@ -230,17 +319,25 @@ class LoginPage extends StatelessWidget {
         const SizedBox(height: 8),
         SizedBox(
           height: 55,
-          child: TextField(
-            obscureText: true,
+          child: TextFormField(
+            controller: _passwordController,
+            validator: _validatePassword,
+            obscureText: _obscurePassword,
             decoration: InputDecoration(
               hintText: "••••••••",
               prefixIcon: const Icon(Icons.lock_rounded, color: Colors.grey),
               suffixIcon: IconButton(
-                icon: const Icon(
-                  Icons.visibility_off_rounded,
+                icon: Icon(
+                  _obscurePassword
+                      ? Icons.visibility_off_rounded
+                      : Icons.visibility_rounded,
                   color: Colors.grey,
                 ),
-                onPressed: () {},
+                onPressed: () {
+                  setState(() {
+                    _obscurePassword = !_obscurePassword;
+                  });
+                },
               ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -261,14 +358,17 @@ class LoginPage extends StatelessWidget {
   }
 
   Widget _buildRememberForgotSection(BuildContext context, bool isSmallScreen) {
-    return Container(
-      width: double.infinity,
+    return SizedBox(
       height: 40,
       child: Row(
         children: [
           // Remember Me
           InkWell(
-            onTap: () {},
+            onTap: () {
+              setState(() {
+                _rememberMe = !_rememberMe;
+              });
+            },
             borderRadius: BorderRadius.circular(8),
             child: Container(
               padding: const EdgeInsets.all(4),
@@ -280,14 +380,18 @@ class LoginPage extends StatelessWidget {
                     height: 20,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(5),
-                      border: Border.all(color: Colors.grey[400]!),
-                      color: Colors.transparent,
+                      border: Border.all(
+                        color: _rememberMe
+                            ? const Color(0xFF667EEA)
+                            : Colors.grey[400]!,
+                      ),
+                      color: _rememberMe
+                          ? const Color(0xFF667EEA)
+                          : Colors.transparent,
                     ),
-                    child: const Icon(
-                      Icons.check,
-                      size: 14,
-                      color: Colors.transparent,
-                    ),
+                    child: _rememberMe
+                        ? const Icon(Icons.check, size: 14, color: Colors.white)
+                        : null,
                   ),
                   const SizedBox(width: 8),
                   Text(
@@ -332,43 +436,62 @@ class LoginPage extends StatelessWidget {
       child: Material(
         borderRadius: BorderRadius.circular(12),
         child: InkWell(
-          onTap: () {
-            // Login action
-          },
+          onTap: _isLoading ? null : _login,
           borderRadius: BorderRadius.circular(12),
           child: Container(
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
-              ),
+              gradient: _isLoading
+                  ? const LinearGradient(
+                      colors: [Colors.grey, Colors.grey],
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                    )
+                  : const LinearGradient(
+                      colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                    ),
               borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.purple.withOpacity(0.3),
-                  blurRadius: 10,
-                  offset: const Offset(0, 5),
-                ),
-              ],
+              boxShadow: _isLoading
+                  ? []
+                  : [
+                      BoxShadow(
+                        color: Colors.purple.withOpacity(0.3),
+                        blurRadius: 10,
+                        offset: const Offset(0, 5),
+                      ),
+                    ],
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
-                  "Sign In",
-                  style: TextStyle(
-                    fontSize: isSmallScreen ? 16 : 18,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
+                if (_isLoading)
+                  SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        Colors.white.withOpacity(0.7),
+                      ),
+                    ),
+                  )
+                else
+                  Text(
+                    "Sign In",
+                    style: TextStyle(
+                      fontSize: isSmallScreen ? 16 : 18,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                const Icon(
-                  Icons.arrow_forward_rounded,
-                  color: Colors.white,
-                  size: 20,
-                ),
+                if (!_isLoading) const SizedBox(width: 12),
+                if (!_isLoading)
+                  const Icon(
+                    Icons.arrow_forward_rounded,
+                    color: Colors.white,
+                    size: 20,
+                  ),
               ],
             ),
           ),
@@ -407,14 +530,18 @@ class LoginPage extends StatelessWidget {
           _buildSocialButton(
             icon: Icons.g_mobiledata_rounded,
             color: Colors.red,
-            onTap: () {},
+            onTap: () {
+              _showSocialLoginMessage('Google');
+            },
             size: isSmallScreen ? 46 : 50,
           ),
           const SizedBox(width: 16),
           _buildSocialButton(
             icon: Icons.facebook_rounded,
             color: Colors.blue,
-            onTap: () {},
+            onTap: () {
+              _showSocialLoginMessage('Facebook');
+            },
             size: isSmallScreen ? 46 : 50,
           ),
           const SizedBox(width: 16),
@@ -422,7 +549,9 @@ class LoginPage extends StatelessWidget {
             icon: Icons.apple_rounded,
             color: Colors.black,
             iconColor: Colors.white,
-            onTap: () {},
+            onTap: () {
+              _showSocialLoginMessage('Apple');
+            },
             size: isSmallScreen ? 46 : 50,
           ),
         ],
